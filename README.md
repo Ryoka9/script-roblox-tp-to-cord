@@ -112,9 +112,9 @@ local function CreateTeleportGUI()
     end
 
     local function TeleportPlayer()
-        local x = -535
-        local y = 278
-        local z = 1178
+        local x = -121
+        local y = 247
+        local z = -532
         local character = game.Players.LocalPlayer.Character
         if character and character:FindFirstChild("HumanoidRootPart") then
             character:MoveTo(Vector3.new(x, y, z))

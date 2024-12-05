@@ -35,6 +35,7 @@ local function CreateTeleportGUI()
     Title.BorderSizePixel = 0
     Title.Font = Enum.Font.GothamBold
     Title.TextSize = 16
+    Title.Active = true
     CreateUICorner(10, Title)
 
     -- === LABEL DE COORDENADAS ===
@@ -87,9 +88,23 @@ local function CreateTeleportGUI()
     CloseButton.BorderSizePixel = 0
     CreateUICorner(5, CloseButton)
 
+    -- === BOTÃO DE MINIMIZAR ===
+    local MinimizeButton = Instance.new("TextButton")
+    MinimizeButton.Parent = Frame
+    MinimizeButton.Position = UDim2.new(1, -65, 0, 7)
+    MinimizeButton.Size = UDim2.new(0, 25, 0, 25)
+    MinimizeButton.Text = "-"
+    MinimizeButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+    MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MinimizeButton.Font = Enum.Font.GothamBold
+    MinimizeButton.TextSize = 14
+    MinimizeButton.BorderSizePixel = 0
+    CreateUICorner(5, MinimizeButton)
+
     -- Variáveis e estado
     local AutoTPEnabled = false
     local AutoTPCoroutine = nil
+    local Minimized = false
 
     -- === FUNÇÕES ===
 
@@ -130,22 +145,62 @@ local function CreateTeleportGUI()
             end)
             coroutine.resume(AutoTPCoroutine)
         else
-            if AutoTPCoroutine then
-                coroutine.yield(AutoTPCoroutine)
-                AutoTPCoroutine = nil
+            AutoTPCoroutine = nil
+        end
+    end
+
+    -- Minimiza ou maximiza a GUI
+    local function ToggleMinimize()
+        Minimized = not Minimized
+        for _, child in ipairs(Frame:GetChildren()) do
+            if child ~= Title and child ~= MinimizeButton then
+                child.Visible = not Minimized
             end
         end
     end
 
-    -- Fecha e remove a GUI
+    -- Fecha e encerra o GUI
     local function CloseGUI()
+        AutoTPEnabled = false -- Desativa Auto TP
         ScreenGui:Destroy()
     end
+
+    -- Permite arrastar o Frame ao clicar no título
+    local dragging = false
+    local dragStart
+    local startPos
+
+    Title.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = Frame.Position
+        end
+    end)
+
+    Title.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            Frame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    Title.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
 
     -- === CONEXÕES ===
     TeleportButton.MouseButton1Click:Connect(TeleportPlayer)
     AutoTPButton.MouseButton1Click:Connect(ToggleAutoTP)
     CloseButton.MouseButton1Click:Connect(CloseGUI)
+    MinimizeButton.MouseButton1Click:Connect(ToggleMinimize)
 
     -- Inicia a atualização das coordenadas em segundo plano
     coroutine.wrap(UpdateCoordinates)()

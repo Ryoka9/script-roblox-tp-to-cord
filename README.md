@@ -30,8 +30,8 @@ local function CreateTeleportGUI()
     Title.Position = UDim2.new(0, 0, 0, 0)
     Title.Size = UDim2.new(1, 0, 0, 40)
     Title.Text = "Ryoka - Teleport GUI"
-    Title.TextColor3 = Color3.fromRGB(255, 50, 50)
-    Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255) -- Branco
+    Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Fundo cinza escuro
     Title.BorderSizePixel = 0
     Title.Font = Enum.Font.GothamBold
     Title.TextSize = 16
@@ -44,7 +44,7 @@ local function CreateTeleportGUI()
     CoordinatesLabel.Position = UDim2.new(0.1, 0, 0.2, 0)
     CoordinatesLabel.Size = UDim2.new(0.8, 0, 0, 30)
     CoordinatesLabel.Text = "Coordinates: -"
-    CoordinatesLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CoordinatesLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- Branco
     CoordinatesLabel.BackgroundTransparency = 1
     CoordinatesLabel.Font = Enum.Font.Gotham
     CoordinatesLabel.TextSize = 14
@@ -55,8 +55,8 @@ local function CreateTeleportGUI()
     TeleportButton.Position = UDim2.new(0.1, 0, 0.4, 0)
     TeleportButton.Size = UDim2.new(0.8, 0, 0, 40)
     TeleportButton.Text = "Teleport to Coordinates"
-    TeleportButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-    TeleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TeleportButton.BackgroundColor3 = Color3.fromRGB(75, 0, 130) -- Roxo escuro
+    TeleportButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Branco
     TeleportButton.Font = Enum.Font.GothamBold
     TeleportButton.TextSize = 14
     TeleportButton.BorderSizePixel = 0
@@ -68,8 +68,8 @@ local function CreateTeleportGUI()
     AutoTPButton.Position = UDim2.new(0.1, 0, 0.6, 0)
     AutoTPButton.Size = UDim2.new(0.8, 0, 0, 40)
     AutoTPButton.Text = "Enable Auto TP"
-    AutoTPButton.BackgroundColor3 = Color3.fromRGB(50, 255, 50)
-    AutoTPButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    AutoTPButton.BackgroundColor3 = Color3.fromRGB(75, 0, 130) -- Roxo escuro
+    AutoTPButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Branco
     AutoTPButton.Font = Enum.Font.GothamBold
     AutoTPButton.TextSize = 14
     AutoTPButton.BorderSizePixel = 0
@@ -81,8 +81,8 @@ local function CreateTeleportGUI()
     CloseButton.Position = UDim2.new(1, -35, 0, 7)
     CloseButton.Size = UDim2.new(0, 25, 0, 25)
     CloseButton.Text = "X"
-    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(75, 0, 130) -- Roxo escuro
+    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Branco
     CloseButton.Font = Enum.Font.GothamBold
     CloseButton.TextSize = 14
     CloseButton.BorderSizePixel = 0
@@ -94,8 +94,8 @@ local function CreateTeleportGUI()
     MinimizeButton.Position = UDim2.new(1, -65, 0, 7)
     MinimizeButton.Size = UDim2.new(0, 25, 0, 25)
     MinimizeButton.Text = "-"
-    MinimizeButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
-    MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MinimizeButton.BackgroundColor3 = Color3.fromRGB(75, 0, 130) -- Roxo escuro
+    MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Branco
     MinimizeButton.Font = Enum.Font.GothamBold
     MinimizeButton.TextSize = 14
     MinimizeButton.BorderSizePixel = 0
@@ -134,8 +134,6 @@ local function CreateTeleportGUI()
     local function ToggleAutoTP()
         AutoTPEnabled = not AutoTPEnabled
         AutoTPButton.Text = AutoTPEnabled and "Disable Auto TP" or "Enable Auto TP"
-        AutoTPButton.BackgroundColor3 = AutoTPEnabled and Color3.fromRGB(255, 50, 50) or Color3.fromRGB(50, 255, 50)
-        
         if AutoTPEnabled then
             AutoTPCoroutine = coroutine.create(function()
                 while AutoTPEnabled do
@@ -153,7 +151,7 @@ local function CreateTeleportGUI()
     local function ToggleMinimize()
         Minimized = not Minimized
         for _, child in ipairs(Frame:GetChildren()) do
-            if child ~= Title and child ~= MinimizeButton then
+            if child ~= Title and child ~= MinimizeButton and child ~= CloseButton then
                 child.Visible = not Minimized
             end
         end
@@ -164,37 +162,6 @@ local function CreateTeleportGUI()
         AutoTPEnabled = false -- Desativa Auto TP
         ScreenGui:Destroy()
     end
-
-    -- Permite arrastar o Frame ao clicar no título
-    local dragging = false
-    local dragStart
-    local startPos
-
-    Title.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = Frame.Position
-        end
-    end)
-
-    Title.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            Frame.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-
-    Title.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
 
     -- === CONEXÕES ===
     TeleportButton.MouseButton1Click:Connect(TeleportPlayer)
